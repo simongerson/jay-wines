@@ -1,15 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { connection } from 'next/server'
 import BottomNav from '@/components/layout/BottomNav'
 import Sidebar from '@/components/layout/Sidebar'
 
+export const instant = false
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  await connection()
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

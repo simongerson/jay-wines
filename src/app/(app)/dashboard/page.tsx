@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
-import { connection } from 'next/server'
+
 import { LayoutDashboard, TrendingUp, Package, AlertTriangle } from 'lucide-react'
 
+export const instant = false
 export default async function DashboardPage() {
-  await connection()
+
   const supabase = await createClient()
 
   // Today's sales
