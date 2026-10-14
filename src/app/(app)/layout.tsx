@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
 import BottomNav from '@/components/layout/BottomNav'
 import Sidebar from '@/components/layout/Sidebar'
 
@@ -8,6 +9,8 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode
 }) {
+  await connection()
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -21,16 +24,11 @@ export default async function AppLayout({
 
   return (
     <div className="flex h-screen bg-[#0d0d0d] overflow-hidden">
-      {/* Sidebar — desktop only */}
       <Sidebar profile={profile} />
-
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
           {children}
         </main>
-
-        {/* Bottom nav — mobile only */}
         <BottomNav role={profile?.role ?? 'cashier'} />
       </div>
     </div>
