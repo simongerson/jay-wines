@@ -7,19 +7,13 @@ export async function completeSale(items: {
   product_id: string
   quantity: number
   unit_price: number
-}[], paymentMethod: string) {
+}[], paymentMethod: string, locationId: string) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: location } = await supabase
-    .from('locations')
-    .select('id')
-    .limit(1)
-    .single()
-
-  if (!location) return { error: 'No location found' }
+  if (!locationId) return { error: 'No location selected' }
 
   const total = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0)
 
@@ -27,7 +21,7 @@ export async function completeSale(items: {
   const { data: sale, error: saleError } = await supabase
     .from('sales')
     .insert({
-      location_id: location.id,
+      location_id: locationId,
       cashier_id: user.id,
       total_amount: total,
       payment_method: paymentMethod,
@@ -59,7 +53,7 @@ export async function completeSale(items: {
       .from('inventory')
       .select('id, quantity_on_hand')
       .eq('product_id', item.product_id)
-      .eq('location_id', location.id)
+      .eq('location_id', locationId)
       .single()
 
     if (inv) {
@@ -70,8 +64,9 @@ export async function completeSale(items: {
         .eq('id', inv.id)
 
       await supabase.from('stock_movements').insert({
+        inventory_id: inv.id,
         product_id: item.product_id,
-        location_id: location.id,
+        location_id: locationId,
         movement_type: 'sale',
         quantity_change: -item.quantity,
         quantity_before: inv.quantity_on_hand,

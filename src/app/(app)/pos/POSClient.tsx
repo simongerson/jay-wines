@@ -78,6 +78,7 @@ export default function POSClient({
 
   async function handleCheckout() {
     if (cart.length === 0) return
+    if (!location) { setError('No location selected'); return }
     setLoading(true)
     setError('')
     const items = cart.map(i => ({
@@ -85,7 +86,7 @@ export default function POSClient({
       quantity: i.quantity,
       unit_price: Number(i.product.selling_price),
     }))
-    const result = await completeSale(items, payment)
+    const result = await completeSale(items, payment, location.id)
     if (result?.error) {
       setError(result.error)
       setLoading(false)
