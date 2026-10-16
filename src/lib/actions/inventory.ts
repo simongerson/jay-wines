@@ -45,6 +45,7 @@ export async function adjustStock(formData: FormData) {
   const { error: movError } = await supabase
     .from('stock_movements')
     .insert({
+      inventory_id: inv.id,
       product_id,
       location_id,
       movement_type,
